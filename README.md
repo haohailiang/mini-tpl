@@ -16,6 +16,7 @@
 <% } %>
 </script>
 ```
+<img src="./images/分词.png" />
 [![NPM version](https://img.shields.io/npm/v/mini-tpl.svg)](https://www.npmjs.com/package/mini-tpl)
 
 A simple template engine,just several rows.
