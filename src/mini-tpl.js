@@ -16,7 +16,7 @@
 }(this, function () {
     /**
      * 模板 + 数据 =》 渲染后的字符串
-     * 
+     *
      * @param {string} content 模板
      * @param {any} data 数据
      * @returns 渲染后的字符串
@@ -37,28 +37,65 @@
                 list.push(txt);
             }
             else {  //文本
-                var txt = 'tpl+="' +
-                    item.txt.replace(/"/g, '\\"') +
-                    '";';
+                var txt = 'tpl+="' + item.txt.replace(/"/g, '\\"') + '";';
                 list.push(txt);
             }
         }
-        list.push('return tpl;');
+        list.push('return tpl;'); // 组成方法体
+
+		// "var tpl = "";"
+		// "tpl+="";"
+		// " for(var i=0; i < data.length; i++){↵    var item = data[i];"
+		// "tpl+="<tr><td>";"
+		// "tpl+=item.id;"
+		// "tpl+="</td>";"
+		// "if(item.status == 0){"
+		// "tpl+="<td>在线</td>";"
+		// "}else{"
+		// "tpl+="<td>离线</td>";"
+		// "}"
+		// "tpl+="<td>";"
+		// "tpl+=item.name;"
+		// "tpl+="</td></tr>";"
+		// " } "
+		// "tpl+="";"
+		// "return tpl;"
 
         return new Function('data', list.join('\n'))(data);
+
+		// 方法体
+		// "var tpl = "";
+		// 	 tpl+="";
+		// 	 for(var i=0; i < data.length; i++){
+		// 		 var item = data[i];
+		// 		 tpl+="<tr><td>";
+		// 		 tpl+=item.id;
+		// 		 tpl+="</td>";
+		// 		 if(item.status == 0){
+		// 			 tpl+="<td>在线</td>";
+		// 		 }else{
+		// 			 tpl+="<td>离线</td>";
+		// 		 }
+		// 		 tpl+="<td>";
+		// 		 tpl+=item.name;
+		// 		 tpl+="</td></tr>";
+		// 	 }
+		// 	 tpl+="";
+		// 	 return tpl;
+		// "
     }
 
     /**
      * 从原始模板中提取 文本/js 部分
-     * 
-     * @param {string} content 
-     * @returns {Array<{type:number,txt:string}>} 
+     *
+     * @param {string} content
+     * @returns {Array<{type:number,txt:string}>}
      */
     function transform(content) {
         var arr = [];                 //返回的数组，用于保存匹配结果
         var reg = /<%([\s\S]*?)%>/g;  //用于匹配js代码的正则
         var match;   				  //当前匹配到的match
-        var nowIndex = 0;			  //当前匹配到的索引     
+        var nowIndex = 0;			  //当前匹配到的索引
 
         while (match = reg.exec(content)) {
             // 保存当前匹配项之前的普通文本/占位
@@ -76,6 +113,29 @@
             //更新当前匹配索引
             nowIndex = match.index + match[0].length;
         }
+		// 分词操作
+		// [
+			// {text: "for(var i=0; i < data.length; i++){↵    var item = data[i];", type: 1} 循环逻辑节点
+			// {text: "<tr><td>"} 普通标签节点
+			// {txt: "item.id", type: 2} 数据节点
+		// ]
+		// [
+		// 	{txt: "\n"}
+		// 	{type: 1, txt: "for(var i=0; i < data.length; i++){var item = data[i];"}
+		// 	{txt: "<tr><td>"}
+		// 	{type: 2, txt: "item.id"}
+		// 	{txt: "</td>"}
+		// 	{type: 1, txt: "if(item.status == 0){"}
+		// 	{txt: "<td>在线</td>"}
+		// 	{type: 1, txt: "}else{"}
+		// 	{txt: "<td>离线</td>"}
+		// 	{type: 1, txt: "}"}
+		// 	{txt: "<td>"}
+		// 	{type: 2, txt: "item.name"}
+		// 	{txt: "</td></tr>"}
+		// 	{type: 1, txt: " } "}
+		// 	{txt: ""}
+		// ]
         //保存文本尾部
         appendTxt(arr, content.substr(nowIndex));
         return arr;
@@ -83,9 +143,9 @@
 
     /**
      * 普通文本添加到数组，对换行部分进行转义
-     * 
-     * @param {Array<{type:number,txt:string}>} list 
-     * @param {string} content 
+     *
+     * @param {Array<{type:number,txt:string}>} list
+     * @param {string} content
      */
     function appendTxt(list, content) {
         content = content.replace(/\r?\n/g, "\\n");

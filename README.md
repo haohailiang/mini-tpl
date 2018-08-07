@@ -1,4 +1,21 @@
-# mini-tpl
+# 前端模板的原理学习
+## 源代码所用代码模板
+```javascript
+<script id="tplContent" type="text/html">
+<% for(var i=0; i < data.length; i++){
+    var item = data[i];%>
+    <tr>
+        <td><%=item.id%></td>
+        <%if(item.status == 0){%>
+        <td>在线</td>
+        <%}else{%>
+        <td>离线</td>
+        <%}%>
+        <td><%=item.name%></td>
+    </tr>
+<% } %>
+</script>
+```
 [![NPM version](https://img.shields.io/npm/v/mini-tpl.svg)](https://www.npmjs.com/package/mini-tpl)
 
 A simple template engine,just several rows.
@@ -27,7 +44,7 @@ If you use npm or yarn.
 Another way,include the script in browser.(build/mini-tpl.min.js)
 
 ## How to use
-The syntax same as [ejs](https://github.com/tj/ejs). 
+The syntax same as [ejs](https://github.com/tj/ejs).
 
 跟[ejs](https://github.com/tj/ejs)一样的语法。
 
@@ -37,7 +54,7 @@ In node:
 // es6 module , typescript
 import tpl from 'mini-tpl';
 // nodejs
-// const tpl = require('mini-tpl'); 
+// const tpl = require('mini-tpl');
 
 const content = `
 <ul>
